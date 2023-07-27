@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "tsc -w & vite build --config ./app/vite.config.ts -w"
+    "dev": "tsc & vite build --config ./app/vite.config.ts -w"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",
@@ -30,7 +30,6 @@
     }
   },
   "dependencies": {
-    "ace-builds": "^1.23.4",
     "js-base64": "^3.7.5",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
@@ -39,8 +38,8 @@
     "koa-static": "^5.0.0",
     "lite-json-editor": "^0.1.3",
     "naive-ui": "^2.34.4",
+    "pinia": "^2.1.6",
     "simple-code-editor": "^2.0.8",
-    "vue": "^3.3.4",
-    "vue3-ace-editor": "^2.2.3"
+    "vue": "^3.3.4"
   }
 }
