@@ -37,4 +37,22 @@ export default (router: Router) => {
       success: true
     };
   });
+
+  router.post('/cgi-bin/mock/delete', (ctx: any) => {
+    const { localStorage } = ctx.req;
+    const { url } = ctx.request.body;
+
+    let mockData = localStorage.getProperty(PLUGIN_NAME);
+    mockData = mockData || '{}';
+    mockData = JSON.parse(mockData);
+    if (mockData[url]) {
+      delete mockData[url];
+    }
+    localStorage.setProperty(PLUGIN_NAME, JSON.stringify(mockData));
+    ctx.body = {
+      code: 200,
+      message: '操作成功',
+      success: true
+    };
+  });
 };

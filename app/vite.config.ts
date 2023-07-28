@@ -28,6 +28,7 @@ export default defineConfig({
     })
   ],
   build: {
+    sourcemap: true,
     outDir: path.resolve(__dirname, '../public'),
     rollupOptions: {
       input: {

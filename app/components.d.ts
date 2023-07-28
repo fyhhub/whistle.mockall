@@ -8,7 +8,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Editor: typeof import('./src/components/Editor.vue')['default']
+    MockList: typeof import('./src/components/MockList.vue')['default']
+    NBadge: typeof import('naive-ui')['NBadge']
+    NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
+    NInput: typeof import('naive-ui')['NInput']
+    NList: typeof import('naive-ui')['NList']
+    NListItem: typeof import('naive-ui')['NListItem']
+    NSpace: typeof import('naive-ui')['NSpace']
     NSwitch: typeof import('naive-ui')['NSwitch']
     NTabPane: typeof import('naive-ui')['NTabPane']
     NTabs: typeof import('naive-ui')['NTabs']
