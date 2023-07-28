@@ -4,9 +4,12 @@
 name: Node.js Package
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
-    - main
+      - main
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
