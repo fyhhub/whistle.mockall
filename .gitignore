@@ -63,4 +63,3 @@ typings/
 /dist
 .console.log
 package-lock.json
-public
