@@ -43,3 +43,4 @@ jspm_packages
 /test
 /.history
 .console.log
+public
