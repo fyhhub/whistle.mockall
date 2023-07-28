@@ -18,7 +18,11 @@ exports.default = (server, options) => {
     (0, koa_onerror_1.default)(app);
     const router = new koa_router_1.default();
     (0, router_1.default)(router);
-    app.use((0, koa_bodyparser_1.default)());
+    app.use((0, koa_bodyparser_1.default)({
+        jsonLimit: '20mb',
+        formLimit: '20mb',
+        textLimit: '20mb'
+    }));
     app.use(router.routes());
     app.use(router.allowedMethods());
     app.use((0, koa_static_1.default)(path_1.default.join(__dirname, '../../public'), { maxage: MAX_AGE }));

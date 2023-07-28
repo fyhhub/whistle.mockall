@@ -15,7 +15,11 @@ export default (server: Whistle.PluginServer, options: Whistle.PluginOptions) =>
   onerror(app);
   const router = new Router();
   setupRouter(router);
-  app.use(bodyParser());
+  app.use(bodyParser({
+    jsonLimit: '20mb',
+    formLimit: '20mb',
+    textLimit: '20mb'
+  }));
   app.use(router.routes());
   app.use(router.allowedMethods());
   app.use(serve(path.join(__dirname, '../../public'), { maxage: MAX_AGE }));
