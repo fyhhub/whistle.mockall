@@ -24,7 +24,7 @@ import { request } from "../common/request";
 const store = useMockStore();
 const { list, url, tabIndex } = storeToRefs(store);
 onMounted(() => {
-  store.initMock();
+  store.initMock({url: url.value});
 })
 const handleView = (key: string) => {
   console.log("%c Line:30 🌶 key", "color:#93c0a4", key);
