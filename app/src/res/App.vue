@@ -1,5 +1,4 @@
 <template>
-  <!-- <LiteJsonEditor v-model="body"/> -->
   <n-card>
     <n-tabs type="segment">
       <n-tab-pane name="响应体" tab="响应体">
