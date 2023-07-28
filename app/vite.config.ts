@@ -28,11 +28,9 @@ export default defineConfig({
     })
   ],
   build: {
-    sourcemap: true,
     outDir: path.resolve(__dirname, '../public'),
     rollupOptions: {
       input: {
-        req: path.resolve(__dirname, 'req.html'),
         res: path.resolve(__dirname, 'res.html'),
       }
     }

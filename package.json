@@ -34,15 +34,7 @@
   "whistleConfig": {
     "inspectorTabs": {
       "page": "public/res.html",
-      "name": "Mock All",
-      "res": {
-        "action": "public/res.html",
-        "name": "Replace"
-      },
-      "req": {
-        "action": "public/req.html",
-        "name": "Replace"
-      }
+      "name": "Mock All"
     }
   },
   "dependencies": {
