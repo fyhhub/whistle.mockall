@@ -1,7 +1,9 @@
 {
   "name": "whistle.mockall",
   "version": "0.0.1",
-  "description": "",
+  "description": "Mock All",
+  "homepage": "https://github.com/fyhhub/whistle.mockall",
+  "license": "MIT",
   "scripts": {
     "dev": "vite build --config ./app/vite.config.ts -w",
     "dev:w2": "npm-run-all --parallel server:run server:lack server:watch",
