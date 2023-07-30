@@ -5,18 +5,18 @@ const PLUGIN_NAME = 'whistle.mockall'
 export default (router: Router) => {
   router.post('/cgi-bin/mock/set', (ctx: any) => {
     const { localStorage } = ctx.req;
-    const { url, resHeaders, resBody, reqHeaders, reqBody } = ctx.request.body;
+    const { url, mockKey, mockData } = ctx.request.body;
 
-    let mockData = localStorage.getProperty(PLUGIN_NAME);
-    mockData = mockData || '{}';
-    mockData = JSON.parse(mockData);
-    mockData[url] = mockData[url] || {}
-    console.log("%c Line:13 🥟 mockData", "color:#33a5ff", mockData);
-    mockData[url].resHeaders = resHeaders === 'empty' ? undefined : resHeaders;
-    mockData[url].resBody = resBody === 'empty' ? undefined : resBody;
-    mockData[url].reqHeaders = reqHeaders === 'empty' ? undefined : reqHeaders;
-    mockData[url].reqBody = reqBody === 'empty' ? undefined : reqBody;
-    localStorage.setProperty(PLUGIN_NAME, JSON.stringify(mockData));
+    let allMock = localStorage.getProperty(PLUGIN_NAME);
+    allMock = allMock || '{}';
+    allMock = JSON.parse(allMock);
+    allMock[url] = allMock[url] || {}
+
+    if (mockData) {
+      allMock[url][mockKey] = mockData === 'empty' ? undefined : mockData;
+    }
+
+    localStorage.setProperty(PLUGIN_NAME, JSON.stringify(allMock));
     ctx.body = {
       code: 200,
       message: '操作成功',

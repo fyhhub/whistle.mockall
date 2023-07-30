@@ -33,7 +33,8 @@
   },
   "whistleConfig": {
     "inspectorTabs": {
-      "page": "public/res.html",
+      "priority": 1,
+      "page": "public/index.html",
       "name": "Mock All"
     }
   },
@@ -48,6 +49,7 @@
     "naive-ui": "^2.34.4",
     "pinia": "^2.1.6",
     "simple-code-editor": "^2.0.8",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-split-view": "^1.0.0"
   }
 }

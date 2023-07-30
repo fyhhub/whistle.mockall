@@ -31,7 +31,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, '../public'),
     rollupOptions: {
       input: {
-        res: path.resolve(__dirname, 'res.html'),
+        index: path.resolve(__dirname, 'index.html'),
       }
     }
   }

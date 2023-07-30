@@ -1,114 +1,92 @@
 <template>
   <div class="editor">
-    <n-space align="center" class="editor__switch">
-      <n-space>
-        <span>Mock开关</span>
-        <n-switch
-          :round="false"
-          v-model:value="isMock"
-          @update:value="handleSwitchMock"
-        >
-        </n-switch>
-      </n-space>
-      <n-badge :dot="hasChanged" v-if="isMock">
-        <n-button @click="setMock(true)">保存</n-button>
-      </n-badge>
-    </n-space>
     <n-input
+      class="editor__input"
       v-model:value="internalCode"
       @update:value="handleInput"
       type="textarea"
-      :autosize="{ minRows: 1, maxRows: 20 }"
+      style="height: 100%;"
+      placeholder="Empty"
     />
   </div>
 </template>
 <script setup lang="ts">
-// @ts-ignore
-import CodeEditor from "simple-code-editor";
-import { useMockStore } from "../stores/index";
-import { storeToRefs } from "pinia";
-import { PropType } from "vue";
-import { request } from "../common/request";
-
+import { useMockStore } from '../stores/index';
+import { storeToRefs } from 'pinia';
+import { setMock } from '../common/api';
 const props = defineProps({
-  type: {
-    type: String as PropType<
-      "resBody" | "resHeaders" | "reqBody" | "reqHeaders"
-    >,
-    default: "resBody",
-  },
-});
-const isMock = ref();
-const internalCode = ref("");
-const hasChanged = ref(false);
+  mockKey: {
+    type: String,
+    default: 'resBody'
+  }
+})
+const internalCode = ref('')
+const store = useMockStore()
+const { mockData, selectedData, url, mockSwitch } = storeToRefs(store)
 
-const store = useMockStore();
-const { resBody, resHeaders, url, fileType, reqBody, reqHeaders } =
-  storeToRefs(store);
+const collectSetMock: Ref<Record<string, any>> = inject('collectSetMock')!;
 
-watch(
-  () => [resBody.value, resHeaders.value, reqBody.value, reqHeaders.value],
-  (val) => {
-    if (!val) return;
-    isMock.value = store.getMockStatus(props.type);
-    if (props.type === "resBody") {
-      let body = resBody.value;
-      if (fileType.value === "json") {
-        body = JSON.stringify(JSON.parse(body), null, 2);
-      }
-      internalCode.value = body;
-      return;
+const setMockFn = (isMock: boolean = true) => {
+  url.value && setMock(url.value, props.mockKey, isMock ? internalCode.value : 'empty');
+}
+
+collectSetMock.value[props.mockKey] = setMockFn;
+
+watch(() => [mockData.value, selectedData.value], () => {
+  if (!selectedData.value && !mockData.value) return ''
+  if (mockData.value?.[url.value]?.[props.mockKey]) {
+    internalCode.value = mockData.value[url.value]?.[props.mockKey] || '';
+    mockSwitch.value[url.value] = {
+      ...(mockSwitch.value[url.value] || {}),
+      [props.mockKey]: true
     }
-
-    if (props.type === "resHeaders") {
-      internalCode.value = resHeaders.value;
-      return;
+    return
+  }
+  if (selectedData.value) {
+    internalCode.value = selectedData.value[props.mockKey]
+    mockSwitch.value[url.value] = {
+      ...(mockSwitch.value[url.value] || {}),
+      [props.mockKey]: false
     }
+    return;
+  }
 
-    if (props.type === "reqBody") {
-      internalCode.value = reqBody.value;
-      return;
-    }
-
-    if (props.type === "reqHeaders") {
-      internalCode.value = reqHeaders.value;
-      return;
-    }
-  },
-  { immediate: true }
-);
-
-const setMock = async (isMock: boolean) => {
-  const params: any = {
-    url: url.value,
-  };
-
-  params[props.type] = isMock ? internalCode.value : "empty";
-  await request(
-    {
-      url: "whistle.mockall/cgi-bin/mock/set",
-      type: "post",
-      mode: "cancel",
-    },
-    params
-  );
-  hasChanged.value = false;
-};
-
-const handleSwitchMock = (val: boolean) => {
-  setMock(val);
-};
+}, { immediate: true })
 
 const handleInput = () => {
-  hasChanged.value = true;
-};
+  mockSwitch.value[url.value] = {
+    ...(mockSwitch.value[url.value] || {}),
+    [props.mockKey]: true
+  }
+  setMockFn();
+}
+
+
 </script>
 <style lang="less" scoped>
 .editor {
   position: relative;
+  height: 100%;
   &__switch {
     position: sticky;
     margin-bottom: 16px;
+  }
+  &__input {
+    border: none;
+    border-radius: 0;
+    font-size: 12px;
+    :deep(.n-input__border) {
+      display: none;
+    }
+    :deep(.n-input__state-border) {
+      display: none;
+    }
+  }
+  &__tool {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    z-index: 1;
   }
 }
 </style>

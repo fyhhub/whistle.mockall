@@ -31,6 +31,7 @@ exports.default = (server, options) => {
                 const resBody = mockData[fullUrl].resBody;
                 const reqBody = mockData[fullUrl].reqBody;
                 const reqHeaders = mockData[fullUrl].reqHeaders;
+                const statusCode = mockData[fullUrl].statusCode;
                 if (resHeaders) {
                     const key = fullUrl + '_resHeaders';
                     rules.push(`${fullUrl} resHeaders://{${key}}`);
@@ -50,6 +51,11 @@ exports.default = (server, options) => {
                     const key = fullUrl + '_reqHeaders';
                     rules.push(`${fullUrl} reqHeaders://{${key}}`);
                     values[key] = reqHeaders;
+                }
+                if (statusCode) {
+                    const key = fullUrl + '_statusCode';
+                    rules.push(`${fullUrl} statusCode://{${key}}`);
+                    values[key] = statusCode;
                 }
             }
             ctx.body = {

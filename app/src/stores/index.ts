@@ -3,49 +3,12 @@ import { request } from '../common/request';
 import { decode } from 'js-base64';
 export const useMockStore = defineStore('user', () => {
 
-  const mockData = ref<any>();
+  const mockData = ref();
 
-  const selected = ref<any>({})
-
-  const getMockStatus = (type: string) => {
-    if (mockData.value?.[type]) {
-      return true;
-    }
-    return false;
-  }
-
-  const resBody = computed(() => {
-    let resBody = selected.value.resBody;
-    if (mockData.value && Object.keys(mockData.value).length) {
-      resBody = mockData.value.resBody || resBody
-    }
-    return resBody;
-  })
-  const resHeaders = computed(() => {
-    let resHeaders = selected.value.resHeaders;
-    if (mockData.value && Object.keys(mockData.value).length) {
-      resHeaders = mockData.value.resHeaders || resHeaders
-    }
-    return resHeaders;
-  })
-  const reqHeaders = computed(() => {
-    let reqHeaders = selected.value.reqHeaders;
-    if (mockData.value && Object.keys(mockData.value).length) {
-      reqHeaders = mockData.value.reqHeaders || reqHeaders
-    }
-    return reqHeaders;
-  })
-  const reqBody = computed(() => {
-    let reqBody = selected.value.reqBody;
-    if (mockData.value && Object.keys(mockData.value).length) {
-      reqBody = mockData.value.reqBody || reqBody
-    }
-    return reqBody;
-  })
-  const tabIndex = ref('Response');
+  const selectedData = ref()
+  const mockSwitch = ref({} as Record<string, any>)
   const url = ref()
   const type = ref();
-  const list = shallowRef();
   const fileType = computed(() => {
     if (!type.value) {
       return 'text'
@@ -70,50 +33,62 @@ export const useMockStore = defineStore('user', () => {
     }
     return 'text'
   })
-  const initMock = async (item?: any) => {
+
+  const isMock = (mockKey: string) => {
+    if (!mockData.value) return false;
+
+    if (!mockData.value[url.value]) return false;
+
+    return !!mockData.value[url.value][mockKey]
+  }
+
+  const getMock = async () => {
     const res: any = await request({
       url: 'whistle.mockall/cgi-bin/mock/get',
       type: 'get',
       mode: 'cancel'
     })
-    list.value = res.data || {};
-    mockData.value = res.data?.[item?.url] || {};
-    console.log("%c Line:27 🍕 mockData.value", "color:#ed9ec7", mockData.value);
+    mockData.value = res.data;
   }
 
-  const initSelected = (item: any) => {
+  const getSelected = (item: any, isInit = true) => {
+    url.value = item.url;
+    if (!isInit) {
+      selectedData.value = {
+        resHeaders: '',
+        resBody: '',
+        reqHeaders: '',
+        reqBody: '',
+        statusCode: ''
+      }
+      return;
+    }
+    type.value = item.type;
     const bodyStr = item.res.base64 ? decode(item.res.base64) : '';
-    const reqBodyStr = item.req.base64 ? decode(item.req.base64) : '';
-    selected.value = {
+    const reqBodyStr = item.req.base64 ? fileType.value !== 'image'?  decode(item.req.base64) : item.req.base64 : '';
+    selectedData.value = {
       resHeaders: JSON.stringify(item.res.headers, null, 2),
       resBody: bodyStr,
       reqHeaders: JSON.stringify(item.req.headers, null, 2),
-      reqBody: reqBodyStr
+      reqBody: reqBodyStr,
+      statusCode: item.res.statusCode
     }
-    type.value = item.type;
-    url.value = item.url;
-    console.log("%c Line:33 🍞 selected.value", "color:#3f7cff", selected.value);
   }
 
-  const init = async (item: any) => {
-    console.log("%c Line:43 🍢 item", "color:#7f2b82", item);
-    initSelected(item)
-    await initMock(item)
+  const init = (item: any) => {
+    getSelected(item)
+    getMock()
   }
+
   return {
-    mockData,
-    selected,
-    list,
+    getMock,
+    getSelected,
     init,
-    initMock,
-    initSelected,
-    resBody,
-    resHeaders,
+    mockData,
+    selectedData,
+    isMock,
     url,
     fileType,
-    getMockStatus,
-    reqBody,
-    reqHeaders,
-    tabIndex
+    mockSwitch
   }
 })
