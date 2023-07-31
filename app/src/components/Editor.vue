@@ -5,70 +5,97 @@
       v-model:value="internalCode"
       @update:value="handleInput"
       type="textarea"
-      style="height: 100%;"
+      style="height: 100%"
       placeholder="Empty"
     />
   </div>
 </template>
 <script setup lang="ts">
-import { useMockStore } from '../stores/index';
-import { storeToRefs } from 'pinia';
-import { setMock } from '../common/api';
+import { useMockStore } from "../stores/index";
+import { storeToRefs } from "pinia";
+import { setMock } from "../common/api";
+import { useMessage } from 'naive-ui'
+const message = useMessage()
 const props = defineProps({
   mockKey: {
     type: String,
-    default: 'resBody'
+    default: "resBody",
+  },
+});
+const internalCode = ref("");
+const store = useMockStore();
+const { mockData, selectedData, url, mockSwitch, fileType } =
+  storeToRefs(store);
+const collectSetMock: Ref<Record<string, any>> = inject("collectSetMock")!;
+
+const realUrl = computed(() => {
+  let u = url.value;
+  // TODO change
+  if (props.mockKey === 'sourcemapMapping') {
+    u = 'global'
   }
+  return u
 })
-const internalCode = ref('')
-const store = useMockStore()
-const { mockData, selectedData, url, mockSwitch, fileType } = storeToRefs(store)
-const collectSetMock: Ref<Record<string, any>> = inject('collectSetMock')!;
 
 const setMockFn = (isMock: boolean = true) => {
-  url.value && setMock(url.value, props.mockKey, isMock ? internalCode.value : 'empty');
-}
+  setMock(realUrl.value, props.mockKey, isMock ? internalCode.value : "empty");
+};
 
 collectSetMock.value[props.mockKey] = setMockFn;
 
-watch(() => [mockData.value, selectedData.value], () => {
-  if (!selectedData.value && !mockData.value) return ''
-  if (mockData.value?.[url.value]?.[props.mockKey]) {
-    internalCode.value = mockData.value[url.value]?.[props.mockKey] || '';
-    mockSwitch.value[url.value] = {
-      ...(mockSwitch.value[url.value] || {}),
-      [props.mockKey]: true
-    }
+watch(
+  () => [mockData.value, selectedData.value],
+  () => {
+    if (!selectedData.value && !mockData.value) return "";
+    if (mockData.value?.[realUrl.value]?.[props.mockKey]) {
+      internalCode.value = mockData.value[realUrl.value]?.[props.mockKey] || "";
+      mockSwitch.value[realUrl.value] = {
+        ...(mockSwitch.value[realUrl.value] || {}),
+        [props.mockKey]: true,
+      };
 
-    formatJson();
-    return
-  }
-  if (selectedData.value) {
-    internalCode.value = selectedData.value[props.mockKey]
-    mockSwitch.value[url.value] = {
-      ...(mockSwitch.value[url.value] || {}),
-      [props.mockKey]: false
+      formatJson();
+      return;
     }
-    formatJson();
-    return;
-  }
-}, { immediate: true })
+    if (selectedData.value) {
+      internalCode.value = selectedData.value[props.mockKey];
+      mockSwitch.value[realUrl.value] = {
+        ...(mockSwitch.value[realUrl.value] || {}),
+        [props.mockKey]: false,
+      };
+      formatJson();
+      return;
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 const handleInput = () => {
-  mockSwitch.value[url.value] = {
-    ...(mockSwitch.value[url.value] || {}),
-    [props.mockKey]: true
+  try {
+    formatJson()
+    mockSwitch.value[realUrl.value] = {
+      ...(mockSwitch.value[realUrl.value] || {}),
+      [props.mockKey]: true,
+    };
+    setMockFn();
+  } catch (e) {
+    message.error('格式化错误，请检测JSON格式')
   }
-  setMockFn();
-}
+};
 
 const formatJson = () => {
-  if (fileType.value === 'json' && (props.mockKey !== 'statusCode')) {
-    internalCode.value = internalCode.value ? JSON.stringify(JSON.parse(internalCode.value), null, 2) : ''
+  // TODO change
+  if (
+    props.mockKey === 'sourcemapMapping' ||
+    props.mockKey === 'reqHeaders' ||
+    props.mockKey === 'resHeaders' ||
+    (fileType.value === 'json' && props.mockKey === 'resBody')
+  ) {
+    internalCode.value = internalCode.value
+      ? JSON.stringify(JSON.parse(internalCode.value), null, 2)
+      : "";
   }
-}
-
-
+};
 </script>
 <style lang="less" scoped>
 .editor {

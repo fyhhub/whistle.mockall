@@ -27,11 +27,7 @@ exports.default = (server, options) => {
         if (mockData) {
             mockData = JSON.parse(mockData);
             if (mockData[fullUrl]) {
-                const resHeaders = mockData[fullUrl].resHeaders;
-                const resBody = mockData[fullUrl].resBody;
-                const reqBody = mockData[fullUrl].reqBody;
-                const reqHeaders = mockData[fullUrl].reqHeaders;
-                const statusCode = mockData[fullUrl].statusCode;
+                const { resHeaders, resBody, reqBody, reqHeaders, statusCode, resDelay, } = mockData[fullUrl];
                 if (resHeaders) {
                     const key = fullUrl + '_resHeaders';
                     rules.push(`${fullUrl} resHeaders://{${key}}`);
@@ -56,6 +52,28 @@ exports.default = (server, options) => {
                     const key = fullUrl + '_statusCode';
                     rules.push(`${fullUrl} statusCode://{${key}}`);
                     values[key] = statusCode;
+                }
+                if (resDelay) {
+                    const key = fullUrl + '_resDelay';
+                    rules.push(`${fullUrl} resDelay://{${key}}`);
+                    values[key] = resDelay;
+                }
+            }
+            if (mockData['global']) {
+                const { sourcemapMapping } = mockData['global'] || {};
+                if (sourcemapMapping) {
+                    try {
+                        const sourcemapJson = JSON.parse(sourcemapMapping);
+                        const filename = Object.keys(sourcemapJson).find(key => fullUrl.includes(key));
+                        const key = filename + '_sourcemapMapping';
+                        if (filename) {
+                            rules.push(`${fullUrl} jsAppend://{${key}}`);
+                            values[key] = `//# sourceMappingURL=${sourcemapJson[filename]}`;
+                        }
+                    }
+                    catch (e) {
+                        console.log(e);
+                    }
                 }
             }
             ctx.body = {

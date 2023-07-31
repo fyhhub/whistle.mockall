@@ -59,7 +59,8 @@ export const useMockStore = defineStore('user', () => {
         resBody: '',
         reqHeaders: '',
         reqBody: '',
-        statusCode: ''
+        statusCode: '',
+        resDelay: ''
       }
       return;
     }
@@ -71,12 +72,13 @@ export const useMockStore = defineStore('user', () => {
       resBody: bodyStr,
       reqHeaders: JSON.stringify(item.req.headers, null, 2),
       reqBody: reqBodyStr,
-      statusCode: item.res.statusCode
+      statusCode: item.res.statusCode,
+      resDelay: ''
     }
   }
 
-  const init = (item: any) => {
-    getSelected(item)
+  const init = (item?: any) => {
+    item && getSelected(item)
     getMock()
   }
 

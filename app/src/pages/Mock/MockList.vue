@@ -20,6 +20,7 @@
             quaternary
             type="error"
             size="tiny"
+            v-if="key as any !== 'global'"
             @click="handleDelete(key as any)"
           >
             删除
