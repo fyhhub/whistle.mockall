@@ -8,9 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Editor: typeof import('./src/components/Editor.vue')['default']
-    NBadge: typeof import('naive-ui')['NBadge']
+    NAlert: typeof import('naive-ui')['NAlert']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
+    NDrawer: typeof import('naive-ui')['NDrawer']
     NInput: typeof import('naive-ui')['NInput']
     NList: typeof import('naive-ui')['NList']
     NListItem: typeof import('naive-ui')['NListItem']

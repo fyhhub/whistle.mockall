@@ -22,8 +22,7 @@ const props = defineProps({
 })
 const internalCode = ref('')
 const store = useMockStore()
-const { mockData, selectedData, url, mockSwitch } = storeToRefs(store)
-
+const { mockData, selectedData, url, mockSwitch, fileType } = storeToRefs(store)
 const collectSetMock: Ref<Record<string, any>> = inject('collectSetMock')!;
 
 const setMockFn = (isMock: boolean = true) => {
@@ -40,6 +39,8 @@ watch(() => [mockData.value, selectedData.value], () => {
       ...(mockSwitch.value[url.value] || {}),
       [props.mockKey]: true
     }
+
+    formatJson();
     return
   }
   if (selectedData.value) {
@@ -48,9 +49,9 @@ watch(() => [mockData.value, selectedData.value], () => {
       ...(mockSwitch.value[url.value] || {}),
       [props.mockKey]: false
     }
+    formatJson();
     return;
   }
-
 }, { immediate: true })
 
 const handleInput = () => {
@@ -59,6 +60,12 @@ const handleInput = () => {
     [props.mockKey]: true
   }
   setMockFn();
+}
+
+const formatJson = () => {
+  if (fileType.value === 'json' && (props.mockKey !== 'statusCode')) {
+    internalCode.value = internalCode.value ? JSON.stringify(JSON.parse(internalCode.value), null, 2) : ''
+  }
 }
 
 
