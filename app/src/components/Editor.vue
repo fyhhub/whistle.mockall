@@ -54,7 +54,7 @@ watch(
         [props.mockKey]: true,
       };
 
-      formatJson();
+      internalCode.value = validJson();
       return;
     }
     if (selectedData.value) {
@@ -63,7 +63,7 @@ watch(
         ...(mockSwitch.value[realUrl.value] || {}),
         [props.mockKey]: false,
       };
-      formatJson();
+      internalCode.value = validJson();
       return;
     }
   },
@@ -72,18 +72,17 @@ watch(
 
 const handleInput = () => {
   try {
-    formatJson()
+    validJson()
     mockSwitch.value[realUrl.value] = {
       ...(mockSwitch.value[realUrl.value] || {}),
       [props.mockKey]: true,
     };
     setMockFn();
   } catch (e) {
-    message.error('格式化错误，请检测JSON格式')
   }
 };
 
-const formatJson = () => {
+const validJson = () => {
   // TODO change
   if (
     props.mockKey === 'sourcemapMapping' ||
@@ -91,10 +90,13 @@ const formatJson = () => {
     props.mockKey === 'resHeaders' ||
     (fileType.value === 'json' && props.mockKey === 'resBody')
   ) {
-    internalCode.value = internalCode.value
-      ? JSON.stringify(JSON.parse(internalCode.value), null, 2)
-      : "";
+    try {
+      return JSON.stringify(JSON.parse(internalCode.value), null, 2)
+    } catch(e) {
+      message.error('格式化错误，请检测JSON格式')
+    }
   }
+  return internalCode.value;
 };
 </script>
 <style lang="less" scoped>
