@@ -52,7 +52,8 @@ export const useMockStore = defineStore('user', () => {
   }
 
   const getSelected = (item: any, isInit = true) => {
-    url.value = item.url;
+    const queIndex = item.url.indexOf('?');
+    url.value = queIndex === -1 ? item.url : item.url.slice(0, queIndex);
     if (!isInit) {
       selectedData.value = {
         resHeaders: '',
