@@ -91,7 +91,7 @@ const validJson = () => {
     (fileType.value === 'json' && props.mockKey === 'resBody')
   ) {
     try {
-      return JSON.stringify(JSON.parse(internalCode.value), null, 2)
+      return internalCode.value ? JSON.stringify(JSON.parse(internalCode.value), null, 2) : ''
     } catch(e) {
       message.error('格式化错误，请检测JSON格式')
     }
