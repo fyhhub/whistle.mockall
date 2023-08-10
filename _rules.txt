@@ -1,7 +1,9 @@
-* whistle.mockall:// resCors://*
+/health\/checkHealth/ resBody://{checkHealth} replaceStatus://200
 
-* htmlAppend://{eruda}
-```eruda
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+```checkHealth
+{
+  "code": 200,
+  "data": {},
+  "message": "success"
+}
 ```
