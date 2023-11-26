@@ -3,28 +3,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const koa_1 = __importDefault(require("koa"));
-const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
-const koa_onerror_1 = __importDefault(require("koa-onerror"));
-const koa_static_1 = __importDefault(require("koa-static"));
+const whistle_plugin_devtool_1 = require("whistle-plugin-devtool");
 const path_1 = __importDefault(require("path"));
-const koa_router_1 = __importDefault(require("koa-router"));
-const router_1 = __importDefault(require("./router"));
-const MAX_AGE = 1000 * 60 * 5;
+const PLUGIN_NAME = 'whistle.mockall';
 exports.default = (server, options) => {
-    const app = new koa_1.default();
-    app.proxy = true;
-    app.silent = true;
-    (0, koa_onerror_1.default)(app);
-    const router = new koa_router_1.default();
-    (0, router_1.default)(router);
-    app.use((0, koa_bodyparser_1.default)({
-        jsonLimit: '20mb',
-        formLimit: '20mb',
-        textLimit: '20mb'
-    }));
-    app.use(router.routes());
-    app.use(router.allowedMethods());
-    app.use((0, koa_static_1.default)(path_1.default.join(__dirname, '../../public'), { maxage: MAX_AGE }));
-    server.on('request', app.callback());
+    const uiServer = new whistle_plugin_devtool_1.WhistleUiServer(server, options);
+    uiServer
+        .config({
+        publicPath: path_1.default.resolve(__dirname, '../../public')
+    })
+        .post('/cgi-bin/mock/set', ({ storage, body }) => {
+        const { url, mockKey, mockData } = body || {};
+        let allMock = storage.get(PLUGIN_NAME) || {};
+        allMock[url] = allMock[url] || {};
+        storage.set(PLUGIN_NAME, allMock);
+        if (mockData) {
+            storage.set(PLUGIN_NAME, mockData === 'empty' ? undefined : mockData, [url, mockKey]);
+        }
+        return {
+            code: 200,
+            message: '操作成功',
+            success: true
+        };
+    })
+        .post('/cgi-bin/mock/delete', ({ storage, body }) => {
+        const { url } = body || {};
+        let mockData = storage.get(PLUGIN_NAME) || {};
+        if (mockData[url]) {
+            delete mockData[url];
+        }
+        storage.set(PLUGIN_NAME, mockData, '');
+        return {
+            code: 200,
+            message: '操作成功',
+            success: true
+        };
+    })
+        .get('/cgi-bin/mock/get', ({ storage }) => {
+        return {
+            code: 200,
+            message: '操作成功',
+            data: storage.get(PLUGIN_NAME),
+            success: true
+        };
+    });
 };
