@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const koa_1 = __importDefault(require("koa"));
+const url_1 = __importDefault(require("url"));
 const PLUGIN_NAME = 'whistle.mockall';
 exports.default = (server, options) => {
     const app = new koa_1.default();
@@ -20,7 +21,8 @@ exports.default = (server, options) => {
     app.use((ctx) => __awaiter(void 0, void 0, void 0, function* () {
         const { req } = ctx;
         const { originalReq } = req;
-        const fullUrl = originalReq.fullUrl;
+        const parsed = url_1.default.parse(originalReq.fullUrl);
+        const fullUrl = `${parsed.protocol}//${parsed.host}${parsed.pathname}`;
         const rules = [];
         const values = {};
         let mockData = storage.getProperty(PLUGIN_NAME);

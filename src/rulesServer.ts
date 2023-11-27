@@ -1,14 +1,15 @@
 import Koa from 'koa';
+import url from 'url';
 const PLUGIN_NAME = 'whistle.mockall'
 
 export default (server: Whistle.PluginServer, options: Whistle.PluginOptions) => {
   const app = new Koa();
   const storage = options.storage;
   app.use(async (ctx) => {
-    const { req } = ctx;
-    // @ts-ignore
+    const { req } = ctx as any;
     const { originalReq } = req;
-    const fullUrl = originalReq.fullUrl;
+    const parsed = url.parse(originalReq.fullUrl)
+    const fullUrl = `${parsed.protocol}//${parsed.host}${parsed.pathname}`;
     const rules = [];
     const values: Record<string, string> = {};
 
